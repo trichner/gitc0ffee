@@ -3,39 +3,39 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/trichner/gitc0ffee/pkg/digest"
 	"os"
 	"os/exec"
-	"strings"
 )
 
-func getCommitContents(digest *hexObjectDigest) (string, error) {
+func getCommitContents(digest *digest.HexObjectDigest) ([]byte, error) {
 
 	out, err := runCommand("git", "cat-file", "-p", string(digest[:]))
 	if err != nil {
-		return "", fmt.Errorf("cannot get contents of revision %q: %w", digest, err)
+		return nil, fmt.Errorf("cannot get contents of revision %q: %w", digest, err)
 	}
 	return out, nil
 }
 
-func getHeadDigest() (*hexObjectDigest, error) {
+func getHeadDigest() (*digest.HexObjectDigest, error) {
 	out, err := runCommand("git", "rev-parse", "HEAD")
 	if err != nil {
 		return nil, fmt.Errorf("cannot read HEAD rev: %w", err)
 	}
 
-	digest := strings.TrimSpace(out)
+	hexDigestBytes := bytes.TrimSpace(out)
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse HEAD rev %q: %w", digest, err)
+		return nil, fmt.Errorf("cannot parse HEAD rev %q: %w", hexDigestBytes, err)
 	}
-	if len(digest) != 40 {
-		return nil, fmt.Errorf("digest length not matching 40 != %d", len(digest))
+	if len(hexDigestBytes) != 40 {
+		return nil, fmt.Errorf("digest length not matching 40 != %d", len(hexDigestBytes))
 	}
-	var hexDigest hexObjectDigest
-	copy(hexDigest[:], digest)
+	var hexDigest digest.HexObjectDigest
+	copy(hexDigest[:], hexDigestBytes)
 	return &hexDigest, nil
 }
 
-func runCommand(prog string, args ...string) (string, error) {
+func runCommand(prog string, args ...string) ([]byte, error) {
 
 	cmd := exec.Command(prog, args...)
 	var out bytes.Buffer
@@ -44,7 +44,7 @@ func runCommand(prog string, args ...string) (string, error) {
 	err := cmd.Run()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return out.String(), nil
+	return out.Bytes(), nil
 }
