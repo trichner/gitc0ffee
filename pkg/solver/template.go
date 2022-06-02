@@ -1,4 +1,4 @@
-package template
+package solver
 
 import (
 	"bytes"
@@ -13,8 +13,9 @@ const saltHeaderName = "coffeesalt"
 const hextable = "0123456789abcdef"
 
 type ObjectTemplate struct {
-	Bytes      []byte
-	saltOffset int
+	Bytes         []byte
+	payloadOffset int
+	saltOffset    int
 }
 
 func (t *ObjectTemplate) SetSalt(salt uint64) {
@@ -26,14 +27,19 @@ func (t *ObjectTemplate) Sum() *digest.ObjectDigest {
 	return &d
 }
 
+func (t *ObjectTemplate) Payload() []byte {
+	return t.Bytes[t.payloadOffset:]
+}
+
 func (t *ObjectTemplate) Copy() *ObjectTemplate {
 
 	newBytes := make([]byte, len(t.Bytes))
 
 	copy(newBytes, t.Bytes)
 	return &ObjectTemplate{
-		Bytes:      newBytes,
-		saltOffset: t.saltOffset,
+		Bytes:         newBytes,
+		saltOffset:    t.saltOffset,
+		payloadOffset: t.payloadOffset,
 	}
 }
 
@@ -61,6 +67,7 @@ func PrepareTemplate(commitObject *commit.Object) (*ObjectTemplate, error) {
 	objectPayload := buf.Bytes()
 
 	objectPrefix := fmt.Sprintf("commit %d\x00", len(objectPayload))
+	payloadOffest := len(objectPrefix)
 
 	var objectBuf bytes.Buffer
 	objectBuf.WriteString(objectPrefix)
@@ -71,8 +78,9 @@ func PrepareTemplate(commitObject *commit.Object) (*ObjectTemplate, error) {
 	}
 
 	return &ObjectTemplate{
-		Bytes:      objectBuf.Bytes(),
-		saltOffset: prefixLength + saltOffset,
+		Bytes:         objectBuf.Bytes(),
+		saltOffset:    prefixLength + saltOffset,
+		payloadOffset: payloadOffest,
 	}, nil
 }
 func hexEncodeUint64(dst []byte, src uint64) {

@@ -2,67 +2,56 @@ package solver
 
 import (
 	"errors"
-	"github.com/trichner/gitc0ffee/pkg/digest"
-	"github.com/trichner/gitc0ffee/pkg/template"
 	"math"
 	"runtime"
 )
 
 const chunkSize = 4096
 
-type solution struct {
-	Digest *digest.HexObjectDigest
-	Bytes  []byte
-}
-
 type concurrentSolver struct {
+	solverFactory SolverFactory
 }
 
-func (c *concurrentSolver) Solve(obj *template.ObjectTemplate, prefix []byte) (*digest.HexObjectDigest, []byte, error) {
+type SolverFactory interface {
+	NewSolver(startSalt, endSalt uint64) DigestPrefixSolver
+}
+
+func (c *concurrentSolver) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObject, error) {
 
 	numWorkers := runtime.NumCPU()
-	tasksChan := make(chan *singleThreaded)
-	solutionChan := make(chan *solution)
+	tasksChan := make(chan DigestPrefixSolver)
+	solutionChan := make(chan *CommitObject)
 
-	// create jobs
-	go func() {
-	}()
-
-	// work on jobs
+	// workers
 	for i := 0; i < numWorkers; i++ {
 		t := obj.Copy()
 		go func() {
 			for job := range tasksChan {
-				hexDigest, data, err := job.Solve(t, prefix)
+				res, err := job.Solve(t, prefix)
 				if errors.Is(err, ErrExhaustedSalts) {
 					continue
 				}
 				if err != nil {
 					panic(err)
 				}
-				solutionChan <- &solution{
-					Digest: hexDigest,
-					Bytes:  data,
-				}
+				solutionChan <- res
 			}
 		}()
 	}
 
+	// creating jobs
 	for {
 		start := uint64(0)
 		end := uint64(chunkSize)
 		for {
-			task := &singleThreaded{
-				saltStart: start,
-				saltEnd:   end,
-			}
+			task := c.solverFactory.NewSolver(start, end)
 
 			select {
 			case tasksChan <- task:
-			case s := <-solutionChan:
+			case solution := <-solutionChan:
 				close(tasksChan)
-				// should we wait fo the others to finish?
-				return s.Digest, s.Bytes, nil
+				//FIXME: if we exhaust all options and don't find a solution we're stuck
+				return solution, nil
 			}
 
 			if end == math.MaxUint64 {
@@ -72,7 +61,7 @@ func (c *concurrentSolver) Solve(obj *template.ObjectTemplate, prefix []byte) (*
 
 			start = end
 			var ok bool
-			end, ok = addU64(end, chunkSize)
+			end, ok = safeAddU64(end, chunkSize)
 			if !ok {
 				end = math.MaxUint64
 			}
@@ -80,7 +69,7 @@ func (c *concurrentSolver) Solve(obj *template.ObjectTemplate, prefix []byte) (*
 	}
 }
 
-func addU64(left, right uint64) (uint64, bool) {
+func safeAddU64(left, right uint64) (uint64, bool) {
 	if left > math.MaxUint64-right {
 
 	}

@@ -3,11 +3,9 @@ package commit
 import (
 	"bytes"
 	"fmt"
-	"strconv"
 )
 
 const gitCommitObjectType = "commit"
-const nullByte = 0
 const newlineByte = 0x0a // \n
 
 type Header struct {
@@ -33,11 +31,6 @@ func ParseGitCommitObject(objectPayload []byte) (*Object, error) {
 
 	buf := bytes.NewBuffer(objectPayload)
 
-	//err := parseGitCommitObjectPrefix(buf)
-	//if err != nil {
-	//	return nil, fmt.Errorf("invalid commit object prefix: %w", err)
-	//}
-
 	headers, err := parseHeaders(buf)
 	if err != nil {
 		return nil, fmt.Errorf("invalid commit object prefix: %w", err)
@@ -55,32 +48,6 @@ func ParseGitCommitObject(objectPayload []byte) (*Object, error) {
 	}
 
 	return obj, nil
-}
-
-func parseGitCommitObjectPrefix(buf *bytes.Buffer) error {
-
-	objectPrefix, err := buf.ReadBytes(nullByte)
-	if err != nil {
-		return fmt.Errorf("git commit object header null terminator missing: %w", err)
-	}
-	objectPrefix = objectPrefix[:len(objectPrefix)-1]
-
-	if !bytes.HasPrefix(objectPrefix, []byte(gitCommitObjectType)) {
-		return fmt.Errorf("invalid commit object header %q", objectPrefix)
-	}
-
-	lengthBytes := bytes.TrimPrefix(objectPrefix, []byte(gitCommitObjectType))
-	lengthBytes = bytes.TrimSpace(lengthBytes)
-
-	n, err := strconv.ParseUint(string(lengthBytes), 10, 32)
-	if err != nil {
-		return fmt.Errorf("git object header length invalid %q: %w", string(lengthBytes), err)
-	}
-	if n == 0 {
-		return fmt.Errorf("git object header length is 0")
-	}
-
-	return nil
 }
 
 func parseHeaders(buf *bytes.Buffer) ([]*Header, error) {

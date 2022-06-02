@@ -21,6 +21,8 @@ c0ffeeb3db6b8b7f72657b3ede42429800b70282
 $ git update-ref HEAD c0ffeeb3db6b8b7f72657b3ede42429800b70282
 ```
 
+*For inspiration see [Hexspeak](https://en.wikipedia.org/wiki/Hexspeak).*
+
 # Previous Work & Inspirations
 
 - https://github.com/phadej/git-badc0de
@@ -30,6 +32,5 @@ $ git update-ref HEAD c0ffeeb3db6b8b7f72657b3ede42429800b70282
 
 # Wishlist
 
-- Use `git hash-object -t commit --stdin` to update the commit object instead of directly writing it.
 - add option to also update branch (`update-ref`)
 
