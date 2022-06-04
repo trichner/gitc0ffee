@@ -82,13 +82,9 @@ func main() {
 }
 
 func updateLastCommit(digest string) error {
-	ref, err := git.GetCurrentBranch()
-	if err != nil {
-		return fmt.Errorf("unable to find current branch/ref: %w", err)
-	}
+	ref := "HEAD"
 	log.Printf("Updating %q to %q", ref, digest)
-	err = git.UpdateReference(ref, digest)
-	if err != nil {
+	if err := git.UpdateReference(ref, digest); err != nil {
 		return fmt.Errorf("failed to update branch/ref %q to object %q: %w", ref, digest, err)
 	}
 

@@ -28,6 +28,8 @@ static void print_hash(uint32_t hash[static STATE_LEN]);
 static bool has_prefix(uint32_t hash[static STATE_LEN], uint8_t prefix[],
                        size_t prefix_len);
 
+static bool should_print_progress(uint64_t salt);
+
 uint64_t solve(uint8_t raw_bytes[], size_t raw_len, uint8_t prefix[],
                size_t prefix_len, size_t salt_offset, uint64_t salt_start,
                uint64_t salt_end) {

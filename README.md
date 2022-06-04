@@ -3,6 +3,12 @@
 Neat tool to find a 'vanity' hash for a given git commit. Make all your commits hashes start with the
 prefix `c0ffee`, `cafe`, `badc0de5` or whatever makes you happy!
 
+# Install
+
+```bash
+go install github.com/trichner/gitc0ffee@latest
+```
+
 # Usage
 
 ```bash
