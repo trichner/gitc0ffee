@@ -2,6 +2,7 @@ package solver
 
 import (
 	"errors"
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"math"
 	"runtime"
 )
@@ -9,18 +10,14 @@ import (
 const chunkSize = 4096
 
 type concurrentSolver struct {
-	solverFactory SolverFactory
+	solverFactory model.SolverFactory
 }
 
-type SolverFactory interface {
-	NewSolver(startSalt, endSalt uint64) DigestPrefixSolver
-}
-
-func (c *concurrentSolver) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObject, error) {
+func (c *concurrentSolver) Solve(obj *model.ObjectTemplate, prefix []byte) (*model.CommitObject, error) {
 
 	numWorkers := runtime.NumCPU()
-	tasksChan := make(chan DigestPrefixSolver)
-	solutionChan := make(chan *CommitObject)
+	tasksChan := make(chan model.DigestPrefixSolver)
+	solutionChan := make(chan *model.CommitObject)
 
 	// workers
 	for i := 0; i < numWorkers; i++ {
@@ -28,7 +25,7 @@ func (c *concurrentSolver) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObj
 		go func() {
 			for job := range tasksChan {
 				res, err := job.Solve(t, prefix)
-				if errors.Is(err, ErrExhaustedSalts) {
+				if errors.Is(err, model.ErrExhaustedSalts) {
 					continue
 				}
 				if err != nil {

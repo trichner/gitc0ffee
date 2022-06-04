@@ -1,25 +1,12 @@
 package solver
 
 import (
-	"fmt"
-	"github.com/trichner/gitc0ffee/pkg/digest"
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
+	"github.com/trichner/gitc0ffee/pkg/solver/native"
 	"math"
 )
 
-var ErrExhaustedSalts = fmt.Errorf("exhausted possible salts without finding a solution")
-
-type CommitObject struct {
-	Raw     []byte
-	Payload []byte
-	Hash    *digest.HexObjectDigest
-}
-
-type DigestPrefixSolver interface {
-	//Solve finds a valid permutation of the ObjectTemplate for which the digest matches the given prefix
-	Solve(obj *ObjectTemplate, prefix []byte) (*CommitObject, error)
-}
-
-func NewSingleThreadedSolver() DigestPrefixSolver {
+func NewSingleThreadedSolver() model.DigestPrefixSolver {
 	return &singleThreaded{
 		saltStart: 0,
 		saltEnd:   math.MaxUint64,
@@ -29,15 +16,21 @@ func NewSingleThreadedSolver() DigestPrefixSolver {
 type singleThreadedSolverFactory struct {
 }
 
-func (s *singleThreadedSolverFactory) NewSolver(startSalt, endSalt uint64) DigestPrefixSolver {
+func (s *singleThreadedSolverFactory) NewSolver(startSalt, endSalt uint64) model.DigestPrefixSolver {
 	return &singleThreaded{
 		saltStart: startSalt,
 		saltEnd:   endSalt,
 	}
 }
 
-func NewConcurrentSolver() DigestPrefixSolver {
-	return &concurrentSolver{
+func NewConcurrentSolver() model.DigestPrefixSolver {
+	return DecorateWithLogging(&concurrentSolver{
 		solverFactory: &singleThreadedSolverFactory{},
-	}
+	})
+}
+
+func NewNativeConcurrentSolver() model.DigestPrefixSolver {
+	return DecorateWithLogging(&concurrentSolver{
+		solverFactory: native.NewFactory(),
+	})
 }

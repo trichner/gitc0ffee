@@ -27,3 +27,7 @@ func HexDecodeDigest(dst *ObjectDigest, src *HexObjectDigest) error {
 	}
 	return nil
 }
+
+func (o *ObjectDigest) String() string {
+	return hex.EncodeToString(o[:])
+}

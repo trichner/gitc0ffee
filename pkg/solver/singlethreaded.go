@@ -2,6 +2,7 @@ package solver
 
 import (
 	"github.com/trichner/gitc0ffee/pkg/digest"
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"log"
 	"time"
 )
@@ -10,7 +11,7 @@ type singleThreaded struct {
 	saltStart, saltEnd uint64
 }
 
-func (s *singleThreaded) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObject, error) {
+func (s *singleThreaded) Solve(obj *model.ObjectTemplate, prefix []byte) (*model.CommitObject, error) {
 
 	tick := time.Now()
 	for salt := s.saltStart; salt < s.saltEnd; salt++ {
@@ -27,7 +28,7 @@ func (s *singleThreaded) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObjec
 
 			var hexDigest digest.HexObjectDigest
 			digest.HexEncodeDigest(&hexDigest, digestBytes)
-			return &CommitObject{
+			return &model.CommitObject{
 				Raw:     obj.Bytes,
 				Payload: obj.Payload(),
 				Hash:    &hexDigest,
@@ -41,7 +42,7 @@ func (s *singleThreaded) Solve(obj *ObjectTemplate, prefix []byte) (*CommitObjec
 		}
 	}
 
-	return nil, ErrExhaustedSalts
+	return nil, model.ErrExhaustedSalts
 }
 
 func hasPrefix(s *digest.ObjectDigest, prefix []byte) bool {

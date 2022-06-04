@@ -54,5 +54,5 @@ features.
 
 # Wishlist
 
-- add option to also update branch (`update-ref`)
+- use CPU accelerated assembly, see also [Linux Implementation](https://github.com/torvalds/linux/blob/master/arch/x86/crypto/sha1_ni_asm.S)
 

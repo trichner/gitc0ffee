@@ -7,7 +7,9 @@ import (
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/git"
 	"github.com/trichner/gitc0ffee/pkg/solver"
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -15,7 +17,14 @@ const gitCommitObjectType = "commit"
 
 var cli struct {
 	UpdateRef bool   `help:"also update the current HEAD revision" default:"false"`
-	Prefix    string `default:"c0ffee"`
+	Prefix    string `help:"a hex prefix to find a collision for" default:"c0ffee"`
+	Solver    string `help:"the solver to use for brute-forcing" default:"concurrent"`
+}
+
+var solvers = map[string]model.DigestPrefixSolver{
+	"concurrent":     solver.NewConcurrentSolver(),
+	"singlethreaded": solver.NewSingleThreadedSolver(),
+	"native":         solver.NewNativeConcurrentSolver(),
 }
 
 func main() {
@@ -47,7 +56,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	foundSolution, err := bruteForceSolution(objTemplate, prefix)
+	s, err := getSolver(cli.Solver)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	foundSolution, err := bruteForceSolution(objTemplate, prefix, s)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,9 +95,8 @@ func updateLastCommit(digest string) error {
 	return nil
 }
 
-func bruteForceSolution(tpl *solver.ObjectTemplate, prefix []byte) (*solver.CommitObject, error) {
+func bruteForceSolution(tpl *model.ObjectTemplate, prefix []byte, s model.DigestPrefixSolver) (*model.CommitObject, error) {
 
-	s := solver.NewConcurrentSolver()
 	tick := time.Now()
 	foundSolution, err := s.Solve(tpl, prefix)
 	if err != nil {
@@ -94,7 +107,19 @@ func bruteForceSolution(tpl *solver.ObjectTemplate, prefix []byte) (*solver.Comm
 	return foundSolution, nil
 }
 
-func writeCommitObject(obj *solver.CommitObject) error {
+func getSolver(name string) (model.DigestPrefixSolver, error) {
+	s, ok := solvers[name]
+	if ok {
+		return s, nil
+	}
+	var availableSolvers []string
+	for k, _ := range solvers {
+		availableSolvers = append(availableSolvers, k)
+	}
+	return nil, fmt.Errorf("unknown solver %q, available: %s", name, strings.Join(availableSolvers, ","))
+}
+
+func writeCommitObject(obj *model.CommitObject) error {
 
 	writtenDigest, err := git.WriteObject(gitCommitObjectType, obj.Payload)
 	if err != nil {
