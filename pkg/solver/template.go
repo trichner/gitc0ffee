@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
+	"strings"
 )
 
 const saltHeaderName = "coffeesalt"
@@ -19,8 +20,10 @@ func PrepareTemplate(commitObject *commit.Object) (*model.ObjectTemplate, error)
 
 	headers := commitObject.Headers()
 	for _, h := range headers {
-		buf.WriteString(h.Value)
-		buf.WriteString("\n")
+		if !strings.HasPrefix(h.Value, saltHeaderPrefix) {
+			buf.WriteString(h.Value)
+			buf.WriteString("\n")
+		}
 	}
 
 	// append salt header, this may lead to duplicates though we don't really care
