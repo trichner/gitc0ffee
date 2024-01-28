@@ -1,9 +1,10 @@
 package solver
 
 import (
+	"math"
+
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"github.com/trichner/gitc0ffee/pkg/solver/native"
-	"math"
 )
 
 func NewSingleThreadedSolver() model.DigestPrefixSolver {
@@ -13,8 +14,7 @@ func NewSingleThreadedSolver() model.DigestPrefixSolver {
 	}
 }
 
-type singleThreadedSolverFactory struct {
-}
+type singleThreadedSolverFactory struct{}
 
 func (s *singleThreadedSolverFactory) NewSolver(startSalt, endSalt uint64) model.DigestPrefixSolver {
 	return &singleThreaded{

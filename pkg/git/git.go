@@ -3,15 +3,15 @@ package git
 import (
 	"bytes"
 	"fmt"
-	"github.com/trichner/gitc0ffee/pkg/digest"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/trichner/gitc0ffee/pkg/digest"
 )
 
 func GetCommitContents(digest *digest.HexObjectDigest) ([]byte, error) {
-
 	out, err := runCommand("git", "cat-file", "-p", string(digest[:]))
 	if err != nil {
 		return nil, fmt.Errorf("cannot get contents of revision %q: %w", digest, err)
@@ -68,13 +68,11 @@ func WriteObject(t string, contents []byte) (*digest.HexObjectDigest, error) {
 }
 
 func runCommand(prog string, args ...string) ([]byte, error) {
-
 	cmd := exec.Command(prog, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
-
 	if err != nil {
 		return nil, err
 	}
@@ -82,14 +80,12 @@ func runCommand(prog string, args ...string) ([]byte, error) {
 }
 
 func runCommandWithStdin(stdin io.Reader, prog string, args ...string) ([]byte, error) {
-
 	cmd := exec.Command(prog, args...)
 	var out bytes.Buffer
 	cmd.Stdin = stdin
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
-
 	if err != nil {
 		return nil, err
 	}

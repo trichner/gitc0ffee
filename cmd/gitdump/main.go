@@ -12,7 +12,6 @@ import (
 const gitObjectBasePath = ".git/objects"
 
 func main() {
-
 	flag.Parse()
 	args := flag.Args()
 	if len(args) <= 0 {
@@ -31,7 +30,6 @@ func main() {
 
 // https://matthew-brett.github.io/curious-git/reading_git_objects.html
 func readGitObject(hexDigest []byte) ([]byte, error) {
-
 	p := getGitObjectPath(hexDigest)
 
 	data, err := os.ReadFile(p)

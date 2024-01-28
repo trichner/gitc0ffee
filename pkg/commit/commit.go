@@ -5,8 +5,10 @@ import (
 	"fmt"
 )
 
-const gitCommitObjectType = "commit"
-const newlineByte = 0x0a // \n
+const (
+	gitCommitObjectType = "commit"
+	newlineByte         = 0x0a // \n
+)
 
 type Header struct {
 	Value string
@@ -26,9 +28,8 @@ func (g *Object) SetHeaders(headers []*Header) {
 	g.headers = headers
 }
 
-//ParseGitCommitObject parses a git commit object without its prefix (i.e. 'commit <len>\0')
+// ParseGitCommitObject parses a git commit object without its prefix (i.e. 'commit <len>\0')
 func ParseGitCommitObject(objectPayload []byte) (*Object, error) {
-
 	buf := bytes.NewBuffer(objectPayload)
 
 	headers, err := parseHeaders(buf)
@@ -51,7 +52,6 @@ func ParseGitCommitObject(objectPayload []byte) (*Object, error) {
 }
 
 func parseHeaders(buf *bytes.Buffer) ([]*Header, error) {
-
 	var headers []*Header
 	for {
 		header, err := parseNextHeader(buf)

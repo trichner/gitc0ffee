@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strings"
+
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
-	"strings"
 )
 
 const saltHeaderName = "coffeesalt"
 
 func PrepareTemplate(commitObject *commit.Object) (*model.ObjectTemplate, error) {
-
 	var buf bytes.Buffer
 
 	saltHeaderPrefix := saltHeaderName + " "

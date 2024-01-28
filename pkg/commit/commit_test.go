@@ -3,9 +3,10 @@ package commit
 import (
 	"bytes"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const rawHeaderAndBodyObject = `tree e57181f20b062532907436169bb5823b6af2f099
@@ -29,5 +30,4 @@ func TestParseHeaders(t *testing.T) {
 	for _, h := range headers {
 		fmt.Println(h.Value)
 	}
-
 }

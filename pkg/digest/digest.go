@@ -7,8 +7,10 @@ import (
 
 const hextable = "0123456789abcdef"
 
-type ObjectDigest [20]byte
-type HexObjectDigest [40]byte
+type (
+	ObjectDigest    [20]byte
+	HexObjectDigest [40]byte
+)
 
 func HexEncodeDigest(dst *HexObjectDigest, src *ObjectDigest) int {
 	j := 0

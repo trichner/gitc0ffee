@@ -21,8 +21,7 @@ type carray struct {
 	len C.size_t
 }
 
-type nativeSolverFactory struct {
-}
+type nativeSolverFactory struct{}
 
 func (n *nativeSolverFactory) NewSolver(startSalt, endSalt uint64) model.DigestPrefixSolver {
 	return &nativeSolver{
@@ -36,7 +35,6 @@ func NewFactory() model.SolverFactory {
 }
 
 func (n *nativeSolver) Solve(obj *model.ObjectTemplate, prefix []byte) (*model.CommitObject, error) {
-
 	rawBytes := toCArray(obj.Bytes)
 	pfxBytes := toCArray(prefix)
 

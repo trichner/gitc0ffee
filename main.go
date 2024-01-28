@@ -3,14 +3,15 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
+	"strings"
+	"time"
+
 	"github.com/alecthomas/kong"
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/git"
 	"github.com/trichner/gitc0ffee/pkg/solver"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
-	"log"
-	"strings"
-	"time"
 )
 
 const gitCommitObjectType = "commit"
@@ -28,7 +29,6 @@ var solvers = map[string]model.DigestPrefixSolver{
 }
 
 func main() {
-
 	kong.Parse(&cli)
 
 	prefix, err := hexStringToBytes(cli.Prefix)
@@ -92,7 +92,6 @@ func updateLastCommit(digest string) error {
 }
 
 func bruteForceSolution(tpl *model.ObjectTemplate, prefix []byte, s model.DigestPrefixSolver) (*model.CommitObject, error) {
-
 	tick := time.Now()
 	foundSolution, err := s.Solve(tpl, prefix)
 	if err != nil {
@@ -109,14 +108,13 @@ func getSolver(name string) (model.DigestPrefixSolver, error) {
 		return s, nil
 	}
 	var availableSolvers []string
-	for k, _ := range solvers {
+	for k := range solvers {
 		availableSolvers = append(availableSolvers, k)
 	}
 	return nil, fmt.Errorf("unknown solver %q, available: %s", name, strings.Join(availableSolvers, ","))
 }
 
 func writeCommitObject(obj *model.CommitObject) error {
-
 	writtenDigest, err := git.WriteObject(gitCommitObjectType, obj.Payload)
 	if err != nil {
 		return fmt.Errorf("failed to write commit object to git store: %w", err)
@@ -128,7 +126,6 @@ func writeCommitObject(obj *model.CommitObject) error {
 }
 
 func hexStringToBytes(s string) ([]byte, error) {
-
 	in := []byte(s)
 	if len(in)%2 != 0 {
 		return nil, fmt.Errorf("odd length hex encoded bytes: len(%s) = %d", s, len(in))

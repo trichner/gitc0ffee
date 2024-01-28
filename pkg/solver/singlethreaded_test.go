@@ -3,10 +3,11 @@ package solver
 import (
 	"crypto/sha1"
 	"errors"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
-	"testing"
 )
 
 const rawHeaderAndBodyObject = `tree e57181f20b062532907436169bb5823b6af2f099
@@ -17,7 +18,6 @@ Initial commit
 36abde0100000000`
 
 func BenchmarkSingleThreaded_Solve(b *testing.B) {
-
 	c, err := commit.ParseGitCommitObject([]byte(rawHeaderAndBodyObject))
 	assert.NoError(b, err)
 
@@ -37,7 +37,6 @@ func BenchmarkSingleThreaded_Solve(b *testing.B) {
 }
 
 func BenchmarkSha1_Sum(b *testing.B) {
-
 	data, err := getBenchBytes()
 	if err != nil {
 		b.Fatal(err)
@@ -49,7 +48,6 @@ func BenchmarkSha1_Sum(b *testing.B) {
 }
 
 func getBenchBytes() ([]byte, error) {
-
 	c, err := commit.ParseGitCommitObject([]byte(rawHeaderAndBodyObject))
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+
 	"github.com/trichner/gitc0ffee/pkg/digest"
 )
 
@@ -14,7 +15,7 @@ type CommitObject struct {
 }
 
 type DigestPrefixSolver interface {
-	//Solve finds a valid permutation of the ObjectTemplate for which the digest matches the given prefix
+	// Solve finds a valid permutation of the ObjectTemplate for which the digest matches the given prefix
 	Solve(obj *ObjectTemplate, prefix []byte) (*CommitObject, error)
 }
 

@@ -1,10 +1,11 @@
 package solver
 
 import (
-	"github.com/trichner/gitc0ffee/pkg/digest"
-	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"log"
 	"time"
+
+	"github.com/trichner/gitc0ffee/pkg/digest"
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
 )
 
 type singleThreaded struct {
@@ -12,15 +13,14 @@ type singleThreaded struct {
 }
 
 func (s *singleThreaded) Solve(obj *model.ObjectTemplate, prefix []byte) (*model.CommitObject, error) {
-
 	tick := time.Now()
 	for salt := s.saltStart; salt < s.saltEnd; salt++ {
 		obj.SetSalt(salt)
 		digestBytes := obj.Sum()
 
-		//if digestBytes[0] == 0xc0 && digestBytes[1] == 0xff && digestBytes[2] == 0xee {
+		// if digestBytes[0] == 0xc0 && digestBytes[1] == 0xff && digestBytes[2] == 0xee {
 		if hasPrefix(digestBytes, prefix) {
-			//if digest[0] == 0xc0 && digest[1] == 0xfe && digest[2] == 0xba && digest[3] == 0xbe {
+			// if digest[0] == 0xc0 && digest[1] == 0xfe && digest[2] == 0xba && digest[3] == 0xbe {
 			tock := time.Now()
 			d := tock.Sub(tick)
 			rate := float64(salt-s.saltStart) / d.Seconds() / 1000

@@ -2,6 +2,7 @@ package model
 
 import (
 	"crypto/sha1"
+
 	"github.com/trichner/gitc0ffee/pkg/digest"
 )
 
@@ -27,7 +28,6 @@ func (t *ObjectTemplate) Payload() []byte {
 }
 
 func (t *ObjectTemplate) Copy() *ObjectTemplate {
-
 	newBytes := make([]byte, len(t.Bytes))
 
 	copy(newBytes, t.Bytes)
@@ -39,7 +39,6 @@ func (t *ObjectTemplate) Copy() *ObjectTemplate {
 }
 
 func hexEncodeUint64(dst []byte, src uint64) {
-
 	// dst must be at least 16 bytes long
 
 	dst[15] = hextable[src&0x0f]

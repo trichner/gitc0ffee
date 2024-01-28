@@ -2,9 +2,10 @@ package solver
 
 import (
 	"errors"
-	"github.com/trichner/gitc0ffee/pkg/solver/model"
 	"math"
 	"runtime"
+
+	"github.com/trichner/gitc0ffee/pkg/solver/model"
 )
 
 const chunkSize = 4096
@@ -14,7 +15,6 @@ type concurrentSolver struct {
 }
 
 func (c *concurrentSolver) Solve(obj *model.ObjectTemplate, prefix []byte) (*model.CommitObject, error) {
-
 	numWorkers := runtime.NumCPU()
 	tasksChan := make(chan model.DigestPrefixSolver)
 	solutionChan := make(chan *model.CommitObject)
@@ -47,7 +47,7 @@ func (c *concurrentSolver) Solve(obj *model.ObjectTemplate, prefix []byte) (*mod
 			case tasksChan <- task:
 			case solution := <-solutionChan:
 				close(tasksChan)
-				//FIXME: if we exhaust all options and don't find a solution we're stuck
+				// FIXME: if we exhaust all options and don't find a solution we're stuck
 				return solution, nil
 			}
 
@@ -68,7 +68,6 @@ func (c *concurrentSolver) Solve(obj *model.ObjectTemplate, prefix []byte) (*mod
 
 func safeAddU64(left, right uint64) (uint64, bool) {
 	if left > math.MaxUint64-right {
-
 	}
 	return left + right, true
 }
