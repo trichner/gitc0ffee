@@ -5,7 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/trichner/gitc0ffee/pkg/solver/util"
+
+	"github.com/trichner/gitc0ffee/pkg/assert"
+
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
 )
@@ -21,7 +24,7 @@ func BenchmarkSingleThreaded_Solve(b *testing.B) {
 	c, err := commit.ParseGitCommitObject([]byte(rawHeaderAndBodyObject))
 	assert.NoError(b, err)
 
-	tpl, err := PrepareTemplate(c)
+	tpl, err := util.PrepareTemplate(c)
 	assert.NoError(b, err)
 
 	s := &singleThreaded{
@@ -53,7 +56,7 @@ func getBenchBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	tpl, err := PrepareTemplate(c)
+	tpl, err := util.PrepareTemplate(c)
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/trichner/gitc0ffee/pkg/solver/util"
+
 	"github.com/alecthomas/kong"
 	"github.com/trichner/gitc0ffee/pkg/commit"
 	"github.com/trichner/gitc0ffee/pkg/git"
@@ -51,7 +53,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	objTemplate, err := solver.PrepareTemplate(obj)
+	objTemplate, err := util.PrepareTemplate(obj)
 	if err != nil {
 		log.Fatal(err)
 	}

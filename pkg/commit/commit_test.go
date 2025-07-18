@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/trichner/gitc0ffee/pkg/assert"
 )
 
 const rawHeaderAndBodyObject = `tree e57181f20b062532907436169bb5823b6af2f099

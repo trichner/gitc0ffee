@@ -4,9 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/trichner/gitc0ffee/pkg/solver/util"
+
+	"github.com/trichner/gitc0ffee/pkg/assert"
+
 	"github.com/trichner/gitc0ffee/pkg/commit"
-	"github.com/trichner/gitc0ffee/pkg/solver"
 	"github.com/trichner/gitc0ffee/pkg/solver/model"
 )
 
@@ -21,7 +23,7 @@ func TestNativeSolver_Solve(t *testing.T) {
 	tpl, err := getTemplate()
 	assert.NoError(t, err)
 
-	s := &nativeSolver{}
+	s := &nativeSolver{saltEnd: 4096 * 1024}
 
 	pfx := []byte{0x88, 0x70}
 
@@ -30,7 +32,7 @@ func TestNativeSolver_Solve(t *testing.T) {
 
 	// then
 	assert.NoError(t, err)
-	assert.Equal(t, []byte("8870"), obj.Hash[:4])
+	assert.EqualSlice(t, []byte("8870"), obj.Hash[:4])
 }
 
 func getTemplate() (*model.ObjectTemplate, error) {
@@ -39,7 +41,7 @@ func getTemplate() (*model.ObjectTemplate, error) {
 		return nil, err
 	}
 
-	tpl, err := solver.PrepareTemplate(c)
+	tpl, err := util.PrepareTemplate(c)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,7 @@ func BenchmarkSingleThreaded_Solve(b *testing.B) {
 	c, err := commit.ParseGitCommitObject([]byte(rawHeaderAndBodyObject))
 	assert.NoError(b, err)
 
-	tpl, err := solver.PrepareTemplate(c)
+	tpl, err := util.PrepareTemplate(c)
 	assert.NoError(b, err)
 
 	s := NewFactory().NewSolver(0, uint64(b.N))
